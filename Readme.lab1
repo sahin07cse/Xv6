@@ -1,0 +1,30 @@
+Implement the Nice System Call in xv6:
+
+How to Run:
+
+1. Run as super user.
+2. Give permission to xv6-public using chmod.
+3. Run xv6 using qemu.
+4. Give "ls" command to see all the available system calls. 
+5. Type "nice nice_value" here nice_value is an integer which you are planning to set. For example, "nice 5" will set 5 as a nice value in nice_value property of structure process. To make a clever way to get the current nice value, if you call nice with 200, it will return the current nice value without setting 200.
+
+Test Code:
+Test codes can be found in nice.c
+
+
+Implementing Pseudo Random Number Generator:
+
+How to run:
+
+1. Run as super user.
+2. Give permission to xv6-public using chmod.
+3. Run xv6 using qemu.
+4. Give "ls" command to see all the available system calls.
+5. Type "pseudorand" and press enter, everytime a new random value will be printed. I have used "Xor32" to generate random.
+
+Test Code:
+The test can be found in "rand.c" 
+
+Difficulties:
+
+Debugging was the difficult part of this lab. Passing argument and parsing from system call was also difficult. Another difficult task was to fix compilation error. I couldn't print unsigned int using xv6 printf, that's why my random generator returns signed integer.
