@@ -90,8 +90,6 @@ sys_uptime(void)
   return xticks;
 }
 
-//Moshrefa
-
 int 
 sys_nice(void)
 {
@@ -103,16 +101,22 @@ sys_nice(void)
 }
 
 int
-sys_pseudorandomgen(void)
+sys_getNice(void)
+{
+   return getNice();
+}
+
+int
+sys_randomNumberGenerator(void)
 {
 
-   int val = pseudorandomgen();
+   int val = randomNumberGenerator();
    cprintf("returned random value : %d\n", val);
    return val;
 }
 
-int sys_show_all_process_status(void) {
-	return show_all_process_status();
+int sys_cps(void) {
+	return cps();
 }
 
 int sys_yield(void) {

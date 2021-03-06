@@ -25,9 +25,9 @@ int total_ticket_count = 0;
 void set_ticket_value_for_process(struct proc* p, int n)
 {
 	cprintf("set_ticket_value_for_process(): PID: %d\n", p->pid);
-	total_ticket_count -= p->nice_value;
-	p->nice_value = n;
-	total_ticket_count += p->nice_value;
+	total_ticket_count -= p->nice;
+	p->nice = n;
+	total_ticket_count += p->nice;
 }
 
 
@@ -213,7 +213,7 @@ fork(void)
   np->parent = curproc;
   *np->tf = *curproc->tf;
 
-  set_ticket_value_for_process(np, curproc->nice_value);
+  set_ticket_value_for_process(np, curproc->nice);
 
   // Clear %eax so that fork returns 0 in the child.
   np->tf->eax = 0;
@@ -456,11 +456,11 @@ int cps(void)
 	cprintf("name \t pid \t state \t\t Tickets \t in_sched \n");
 	for (p = ptable.proc; p < &ptable .proc[NPROC]; p++) {
 		if (p->state == SLEEPING)
-			cprintf("%s \t %d \t SLEEPING  \t %d \t\t %d\n ", p->name, p->pid, p->nice_value, p->in_sched);
+			cprintf("%s \t %d \t SLEEPING  \t %d \t\t %d\n ", p->name, p->pid, p->nice, p->in_sched);
 		else if (p->state == RUNNING)
-			cprintf("%s \t %d \t RUNNING   \t %d \t\t %d\n ", p->name, p->pid, p->nice_value, p->in_sched);
+			cprintf("%s \t %d \t RUNNING   \t %d \t\t %d\n ", p->name, p->pid, p->nice, p->in_sched);
 		else if (p->state == RUNNABLE)
-			cprintf("%s \t %d \t RUNNABLE  \t %d \t\t %d\n ", p->name, p->pid, p->nice_value, p->in_sched);
+			cprintf("%s \t %d \t RUNNABLE  \t %d \t\t %d\n ", p->name, p->pid, p->nice, p->in_sched);
 
 	}
 	cprintf("\n\n PROCESS STATUS ENDS \n\n");

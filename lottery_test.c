@@ -15,7 +15,7 @@ int pids[CHILDRENS];
 
 int create_process(int tickets) {
     int pid = fork();
-    //cprintf("fork returned pid: ");
+    //cprintf("returned pid: %d\n", pid);
     if (pid == 0) {
         nice(tickets);
 	yield();
@@ -32,7 +32,7 @@ int create_process(int tickets) {
 void execute_test() {
     nice(100);
     for (int i = 0; i < CHILDRENS; i++) {
-	int n = pseudorandomgen();
+	int n = randomNumberGenerator();
 	if (n < 0) n = -n; //To handle negative number
 	n = n % 100;
 	tickets[i] = n;
@@ -49,7 +49,7 @@ void execute_test() {
         if (done)
             break;
 
-	show_all_process_status();
+	cps();
     }
 
     nice(100);

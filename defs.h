@@ -121,8 +121,8 @@ int             wait(void);
 void            wakeup(void*);
 void            yield(void);
 int		nice(int);
-int		pseudorandomgen(void);
-int		show_all_process_status(void);
+int		randomNumberGenerator(void);
+int		cps(void);
 
 // swtch.S
 void            swtch(struct context**, struct context*);

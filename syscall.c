@@ -106,9 +106,9 @@ extern int sys_uptime(void);
 extern int sys_nice(void);
 extern int sys_getNice(void);
 extern int sys_randomNumberGenerator(void);
-extern int sys_show_all_process_status(void);
+//extern int sys_show_all_process_status(void);
 extern int sys_yield(void);
-
+extern int sys_cps(void);
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
 [SYS_exit]    sys_exit,

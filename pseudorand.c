@@ -7,7 +7,7 @@ int
 main (int argc, char* argv[])
 { 
 
-	int value = pseudorandomgen();
+	int value = randomNumberGenerator();
 	//printf("returned random value is %d\n", value);
 	exit();
 }
