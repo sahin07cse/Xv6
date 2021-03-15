@@ -21,6 +21,7 @@
 #define SYS_mkdir  20
 #define SYS_close  21
 #define SYS_nice   22
-#define SYS_randomGen 23
-#define SYS_show_all_process_status 24
-#define SYS_yield 25
+#define SYS_getNice 23
+#define SYS_randomNumberGenerator   24
+#define SYS_cps 25
+#define SYS_yield 26

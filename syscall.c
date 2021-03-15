@@ -104,11 +104,10 @@ extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
 extern int sys_nice(void);
-extern int sys_getNice(void);
-extern int sys_randomNumberGenerator(void);
-//extern int sys_show_all_process_status(void);
+extern int sys_randomGen(void);
+extern int sys_show_all_process_status(void);
 extern int sys_yield(void);
-extern int sys_cps(void);
+
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
 [SYS_exit]    sys_exit,
@@ -132,9 +131,8 @@ static int (*syscalls[])(void) = {
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
 [SYS_nice]    sys_nice,
-[SYS_getNice] sys_getNice,
-[SYS_randomNumberGenerator] sys_randomNumberGenerator, 
-[SYS_cps] sys_cps,
+[SYS_randomGen] sys_randomGen,
+[SYS_show_all_process_status] sys_show_all_process_status,
 [SYS_yield]   sys_yield,
 };
 

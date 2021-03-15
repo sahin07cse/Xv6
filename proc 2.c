@@ -20,12 +20,14 @@ extern void trapret(void);
 
 static void wakeup1(void *chan);
 
-int total_tickets = 0;
+int total_ticket_count = 0;
 
-void set_tickets(struct proc* p, int n) {
-	total_tickets -= p->nice;
+void set_ticket_value_for_process(struct proc* p, int n)
+{
+	cprintf("set_ticket_value_for_process(): PID: %d\n", p->pid);
+	total_ticket_count -= p->nice;
 	p->nice = n;
-	total_tickets += p->nice;
+	total_ticket_count += p->nice;
 }
 
 
@@ -211,7 +213,7 @@ fork(void)
   np->parent = curproc;
   *np->tf = *curproc->tf;
 
-  set_tickets(np, curproc->nice);
+  set_ticket_value_for_process(np, curproc->nice);
 
   // Clear %eax so that fork returns 0 in the child.
   np->tf->eax = 0;
@@ -308,7 +310,7 @@ wait(void)
         p->name[0] = 0;
         p->killed = 0;
         p->state = UNUSED;
-        set_tickets(p, 0);
+        set_ticket_value_for_process(p, 0);
         release(&ptable.lock);
         return pid;
       }
@@ -334,11 +336,11 @@ wait(void)
 //  - eventually that process transfers control
 //      via swtch back to the scheduler.
 
-#ifdef LOTTERY_SCHEDULER
+#ifdef LOTTERY_SCHEDULING_ENABLED
 
 void scheduler(void)
 {
-	cprintf("scheduler() is running lottery scheduling mechanism\n");
+	cprintf("Running Lottery Scheduling\n");
 	struct proc *p;
 
 	struct cpu *c = mycpu();
@@ -346,7 +348,7 @@ void scheduler(void)
 
 	// Set init's tickets to 1
 	acquire(&ptable.lock);
-	set_tickets(ptable.proc, 1);
+	set_ticket_value_for_process(ptable.proc, 1);
 	release(&ptable.lock);
 
 	for(;;){
@@ -354,9 +356,9 @@ void scheduler(void)
 		sti();
 
 		// Winning ticket
-		const int winner = randomGen()%(total_tickets + 1);
+		const int winning_ticket = pseudorandomgen()%(total_ticket_count + 1);
 
-		int tickets = 0;
+		int ticket_count = 0;
 
 		// Loop over process table looking for process to run.
 		acquire(&ptable.lock);
@@ -365,13 +367,13 @@ void scheduler(void)
 			// We're only looking for runnable processes
 			if(p->state != RUNNABLE)
 			{
-				tickets += p->nice;
+				ticket_count += p->nice_value;
 				continue;
 			}
 
-			tickets += p->nice;
+			ticket_count += p->nice_value;
 
-			if(tickets < winner)
+			if(ticket_count < winning_ticket)
 			{
 
 				continue;
@@ -385,6 +387,7 @@ void scheduler(void)
 			switchuvm(p);
 			p->state = RUNNING;
 			p->in_sched = 1;
+			const int tickstart = ticks;
 
 			swtch(&(c->scheduler), p->context);
 			p->in_sched = 0;
@@ -406,7 +409,7 @@ void scheduler(void)
 void
 scheduler(void)
 {
-  cprintf("Running Round Robin\n");
+  cprintf("Running Default Scheduling(Round Robin)\n");
   struct proc *p;
   struct cpu *c = mycpu();
   c->proc = 0;
@@ -443,24 +446,24 @@ scheduler(void)
 #endif
 
 
-int show_all_process_status(void) 
+int cps(void) 
 {
 	struct proc *p;
 	sti();
 
 	acquire(&ptable.lock);
-	cprintf("\n\n  ****** PROCESS STAT ****** \n\n");
-	cprintf("name \t pid \t state \t\t Remaining Tickets\n");
+	cprintf("\n\n  PROCESS STATUS BEGINS \n\n");
+	cprintf("name \t pid \t state \t\t Tickets \t in_sched \n");
 	for (p = ptable.proc; p < &ptable .proc[NPROC]; p++) {
 		if (p->state == SLEEPING)
-			cprintf("%s \t %d \t SLEEPING  \t %d\n ", p->name, p->pid, p->nice);
+			cprintf("%s \t %d \t SLEEPING  \t %d \t\t %d\n ", p->name, p->pid, p->nice, p->in_sched);
 		else if (p->state == RUNNING)
-			cprintf("%s \t %d \t RUNNING   \t %d\n ", p->name, p->pid, p->nice);
+			cprintf("%s \t %d \t RUNNING   \t %d \t\t %d\n ", p->name, p->pid, p->nice, p->in_sched);
 		else if (p->state == RUNNABLE)
-			cprintf("%s \t %d \t RUNNABLE  \t %d\n ", p->name, p->pid, p->nice);
+			cprintf("%s \t %d \t RUNNABLE  \t %d \t\t %d\n ", p->name, p->pid, p->nice, p->in_sched);
 
 	}
-	cprintf("\n\n ######## PROCESS STAT ######### \n\n");
+	cprintf("\n\n PROCESS STATUS ENDS \n\n");
 
 	release(&ptable.lock);
 	return 22;
@@ -646,30 +649,46 @@ procdump(void)
   }
 }
 
-int nice(int nice_value) 
-{
-    acquire(&ptable.lock);
+int nice(int value) {
+    struct proc* pc = myproc();
+    cprintf("setNice Called for pid %d\n", pc->pid);
+    cprintf("SetNice value :  %d\n", value);
 
-    struct proc* process;
-    process = myproc();
+    pc->nice = value;
 
-    if (nice_value == 1000) //Clever argument
-    {
-	release(&ptable.lock);
-	cprintf("Returning getNice Value: %d\n", process->nice);
-	return process->nice;
-    }
-    process->nice = nice_value;
-    cprintf("Nice value of the process %d is set to: %d\n", process->pid, process->nice);
-    release(&ptable.lock);
-    return nice_value;
+    return pc->nice;
 }
 
-int randomGen(void) 
-{
-	//Code borrowed from xorshift
-        static int y = 2463534242;
-	y^=(y<<13); y^=(y>>17); 
-	y^=(y<<15);
-	return (int)y;
+int
+getNice(void) {
+    struct proc* pc = myproc();
+    cprintf("gerNice Called for pid %d\n", pc->pid);
+    cprintf("GetNice value :  %d\n", pc->nice);
+
+    return pc->nice;
+}
+
+   //int a = 4;
+   //int b = 3;
+   //int c = 11;
+   //int d = 22; 
+
+int
+randomNumberGenerator(void) {
+   static int a = 4;
+   static int b = 3;
+   static int c = 11;
+   static int d = 22; 
+
+   cprintf("randomNumberGenerator called for pid: %d\n", myproc()->pid);
+   int temp = b;
+   temp ^= temp << 11U;
+   temp ^= temp >> 17U;
+   b = c; c = d; d = a;
+   a ^= a >> 21U;
+   a ^= temp;
+   
+   cprintf("Random number :  %d\n", a);
+   
+   return a;
 }

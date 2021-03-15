@@ -77,6 +77,8 @@ sys_sleep(void)
   return 0;
 }
 
+// return how many clock tick interrupts have occurred
+// since start.
 int
 sys_uptime(void)
 {
@@ -99,16 +101,22 @@ sys_nice(void)
 }
 
 int
-sys_randomGen(void)
+sys_getNice(void)
+{
+   return getNice();
+}
+
+int
+sys_randomNumberGenerator(void)
 {
 
-   int val = randomGen();
-   cprintf("returned from proc::randomGen() : %d\n", val);
+   int val = randomNumberGenerator();
+   cprintf("returned random value : %d\n", val);
    return val;
 }
 
-int sys_show_all_process_status(void) {
-	return show_all_process_status();
+int sys_cps(void) {
+	return cps();
 }
 
 int sys_yield(void) {

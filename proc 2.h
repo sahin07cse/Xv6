@@ -40,6 +40,7 @@ struct proc {
   pde_t* pgdir;                // Page table
   char *kstack;                // Bottom of kernel stack for this process
   enum procstate state;        // Process state
+  int in_sched;
   int pid;                     // Process ID
   struct proc *parent;         // Parent process
   struct trapframe *tf;        // Trap frame for current syscall
@@ -48,13 +49,11 @@ struct proc {
   int killed;                  // If non-zero, have been killed
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
-  char name[16];               // Process name
+  char name[16];               // Process name (debugging)
   int nice;
-  int in_sched;
 };
 
-// Set Process Nice
-void set_tickets(struct proc* pp, int n);
+void set_ticket_value_for_process(struct proc* pp, int n);
 
 // Process memory is laid out contiguously, low addresses first:
 //   text

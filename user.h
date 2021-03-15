@@ -24,9 +24,8 @@ char* sbrk(int);
 int sleep(int);
 int uptime(void);
 int nice(int);
-int getNice(void);
-int randoms(void);
-int cps(void);
+int randomGen(void);
+int show_all_process_status(void);
 int yield(void);
 
 // ulib.c
